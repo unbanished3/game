@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <a href="index.html">На главную</a>
+        <div class="records">
+
+        </div>
+    </header>
+</body>
+</html>
+
+<script>
+    records_block = document.querySelector(".records")
+    records = JSON.parse(localStorage.getItem("records"))
+    let records_row = []
+    for(let key in records){
+        records_row.push([key, records[key]])
+    }
+    records_row.sort((a, b) => b[1] - a[1])
+    for(let pair of records_row){
+        records_block.innerHTML += `<p>${pair[0]}: ${pair[1]}</p>`
+    }
+</script>

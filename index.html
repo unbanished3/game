@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header class="info">
+        <label class="points">Очки:</label>
+        <button class="button" onclick="play()">Start</button>
+        <label class="timer hidden">Времени осталось:</label>
+        <label class="tryes">Попыток осталось:</label>
+        <label class="rate">Счёт: 0</label>
+        <a href="record_page.html">Таблица рекордов</a>
+    </header>
+    <main>
+        <div class="game">
+
+        </div>
+        
+    </main>
+</body>
+</html>
+
+<style>
+    body{
+        font: 1em, sans-serif;
+        padding: 0;
+        margin: 0;
+    }
+
+    main{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    img{
+        object-fit: cover;
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+    }
+
+    .info{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        height: min(1rem, 3svh);
+        padding: min(1rem, 3svh);
+    }
+
+    .game{
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        width: min(30rem, 60svw);
+        height: min(30rem, 90svh);
+        margin: min(1rem, 3svh);
+        max-height: fit-content;
+    }
+
+    .button{
+        height: min(2rem, 6svh);
+        width: min(6rem, 12svw);
+        margin: min(2rem, 6swh);
+    }
+
+    .hidden{
+        display: none;
+    }
+
+    .tile{
+        background-color: gray;
+        border-style: solid;
+    }
+</style>
+
+<script>
+    const tryes_on_start = 3
+    const timer_on_start = 8
+
+    let table = document.querySelector(".game")
+    let button = document.querySelector(".button")
+    let timer_row = document.querySelector(".timer")
+    let tryes_row = document.querySelector(".tryes")
+
+    let tryes = tryes_on_start
+    let timer_time = timer_on_start
+    let points = 0
+
+    let is_game_started = false
+
+    let img_array = [
+        "https://pngteam.com/images/2-number-png-3500x3500_c9b8c66b_transparent.png",
+        "https://s8.hostingkartinok.com/uploads/images/2016/07/84f2d21064b6b4fe629ed879807590b7.png",
+        "https://www.clker.com/cliparts/n/C/g/1/l/x/red-rounded-square-with-number-3-hi.png",
+        "https://pngteam.com/images/1-number-png-2400x2400_a36fcbf7_transparent.png",
+        "https://e7.pngegg.com/pngimages/529/563/png-clipart-scalable-graphics-number-2-blue-text.png",
+        "https://cdn.picpng.com/4/four-4-number-numeral-72279.png",
+        "https://img.freepik.com/premium-vector/number-11-vector-design-element_154156-14576.jpg?size=626&ext=jpg",
+        "https://media.baamboozle.com/uploads/images/371297/1629285938_17541_url.jpeg",
+        "https://clipartmag.com/images/number-13-cliparts-34.jpg",
+        "https://www.happyhourspanish.com/wp-content/uploads/2016/10/Spanish-idioms-with-numbers-11-green.png",
+        "https://www.kindpng.com/picc/m/151-1511686_10-number-free-png-image-10-times-new.png",
+        "https://w7.pngwing.com/pngs/839/358/png-transparent-natural-number-wallsend-eagles-information-kabayaki-others-blue-text-logo.png",
+        "https://i.pinimg.com/originals/ef/7a/a9/ef7aa9f40f72768c3a353a834c3715db.png",
+        "https://img.razrisyika.ru/img/121/1200/482708-volshebnaya-raskraska-stranica-12.jpg",
+        "https://i5.walmartimages.com/asr/f3cbb2a7-b707-456f-9903-ff44a0ccc899_1.78023a061207bf802907e73ccbcf3a1e.jpeg",
+        "https://www.activityshelter.com/wp-content/uploads/2016/04/picture-of-the-number-5-red.jpg",
+        "https://www.drodd.com/images15/18-9.jpg",
+        "https://www.printablee.com/postpic/2015/05/printable-number-0-coloring-pages_221549.jpg",
+        "https://i.pinimg.com/originals/6c/af/0e/6caf0eb679ea4deabd4318762f91a3f1.jpg",
+        "https://www.kindpng.com/picc/m/151-1512000_how-to-calculate-soul-urge-number-number-11.png",
+        "https://i5.walmartimages.com/asr/5975865f-a35a-4fcc-a488-7b0453abb63b_1.eb3525881ccd7b03d63a6564edda99a7.jpeg",
+        "https://www.freepnglogos.com/uploads/number-7-png/number-7-number-digits-circle-silver-icon-transparent-image-32.png",
+        "https://coloringpagesonly.com/images/pages/number-thirty0.jpg",
+        "https://avatars.dzeninfra.ru/get-zen_brief/6488213/pub_62dbf11d31c7216daba7bcd3_62dbf11d31c7216daba7bcd4/scale_1200",
+        "https://thumbs.dreamstime.com/z/зо-отых-же-тых-номеров-на-траве-42163566.jpg",
+        "https://image.shutterstock.com/shutterstock/photos/1408077026/display_1500/stock-photo-white-numbers-on-green-grass-background-copy-space-1408077026.jpg",
+        "https://static.baza.farpost.ru/v/1670226297369_bulletin",
+        "https://static.baza.farpost.ru/v/1544406941325_bulletin",
+        "https://static.baza.farpost.ru/v/1653873422304_bulletin",
+        "https://w7.pngwing.com/pngs/842/147/png-transparent-number-pink-numbers-love-heart-magenta.png",
+        "https://www.labelsxpress.com/img/products/1364060383_NUMBERS-3Yellow1.5diameterCircle_3.jpg",
+        "https://heroes-generals.com/wp-content/uploads/2018/01/10Million.jpg",
+    ]
+
+    let table_array = img_array.concat(img_array)
+
+    function play() {
+        table_array = table_array.sort((a, b) => 0.5 - Math.random())
+        button.classList.add("hidden")
+
+        points = 0
+        timer_time = timer_on_start
+        tryes = tryes_on_start
+        
+        let counter = 0
+
+        table_array.forEach(link => {
+            let img_block = ""
+            img_block += `<div class="tile" onclick="pick_tile('img_${counter}', '${link}')">`
+            img_block += `<img src='${link}' class="tile__img" id="img_${counter}">`
+            img_block += "</div>"
+            table.innerHTML += img_block
+            counter += 1
+        });
+
+        timer_row.classList.remove("hidden")
+
+        let timer = setInterval(time_count, 1000)
+
+        function time_count() {
+            timer_time -= 1
+            if(timer_time === 0){
+                clearInterval(timer)
+                timer_row.classList.add("hidden")
+                images = document.querySelectorAll(".tile__img")
+                images.forEach(image => {image.classList.add("hidden")})
+                tryes_row.innerHTML = `Попыток осталось: ${tryes}`
+                is_game_started = true
+                return
+            }
+            timer_row.innerHTML = `Времени осталось: ${timer_time}`
+        }
+    }
+
+    let picked_link = ""
+    let picked_image = null
+    let guessed_links = []
+    function pick_tile(counter, link) {
+        if(!is_game_started){
+            return
+        }
+
+        if(picked_image === counter) {
+            return
+        }
+
+        if(guessed_links.includes(link)){
+            return
+        }
+
+        if(picked_link === ""){
+            image = document.querySelector(`#${counter}`)
+            image.classList.remove("hidden")
+            picked_link = link
+            picked_image = counter
+            return
+        }
+
+        if (picked_link !== link) {
+            image.classList.add("hidden")
+            image = document.querySelector(`#${counter}`)
+            image.classList.add("hidden")
+            picked_link = ""
+            picked_image = null
+            tryes -= 1
+            if (tryes === 0) {
+                is_game_started = false
+                write_to_record(points)
+                to_start()
+            }
+            tryes_row.innerHTML = `Попыток осталось: ${tryes}`
+            return
+        }
+
+        if(picked_link === link){
+            image = document.querySelector(`#${counter}`)
+            image.classList.remove("hidden")
+            rate = document.querySelector(".rate")
+            guessed_links.push(link)
+            points += 1
+            rate.innerHTML = `Счёт: ${points}`
+            picked_link = ""
+            picked_image = null
+            if(guessed_links.length === img_array.length){
+                is_game_started = false
+                write_to_record(points)
+                to_start()
+            }
+        }
+
+    }
+
+    function write_to_record(points) {
+        if(localStorage.getItem("records") === null){
+            localStorage.setItem("records", JSON.stringify({kostyl: 33}))
+        }
+        records = JSON.parse(localStorage.getItem("records"))
+        let user_name = prompt("Введите имя в таблицу рекордов", '')
+        records[user_name] = points
+        delete records.kostyl
+        localStorage.setItem("records", JSON.stringify(records))
+        return
+    }
+
+    function to_start() {
+        button.classList.remove("hidden")
+        table.innerHTML = '<div class="game"></div>'
+    }
+
+</script>
